@@ -2,41 +2,78 @@
   <div id="app">
     <nav>
       <ul class="nav-list">
-        <li v-for="(page, index) in pages" :key="index" @click="changePage(page)" :class="{ active: activePage === page }">
+        <li v-for="(page, index) in pages" :key="index" @click="navigate(page)" :class="{ active: activePage === page }" >
           {{ page }}
         </li>
       </ul>
+      <!-- Display username in the top-right corner -->
+      <div class="user-info" v-if="user">
+        {{ user.username }}
+      </div>
     </nav>
 
-    <hr>
+    <hr />
 
-    <div>
-      <HomePage v-if="activePage == 'home'" />
-    </div>
+    <HomePage v-show="activePage === 'home'" />
+    <LoginPage
+      v-show="activePage === 'login'"
+      ref="loginPage"
+      @navigate-register="showRegisterPage"
+      @login-success="handleLoginSuccess"
+      @user-data="setUser"
+    />
+    <RegisterPage
+      v-show="activePage === 'register'"
+      @navigate-login="showLoginPage"
+      @register-success="handleRegisterSucces"
+    />
   </div>
 </template>
 
 <script>
-import HomePage from './components/HomePage.vue';
+import HomePage from "./components/HomePage.vue";
+import LoginPage from "./components/LoginPage.vue";
+import RegisterPage from "./components/RegisterPage.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     HomePage,
+    LoginPage,
+    RegisterPage,
   },
   data() {
     return {
-      activePage: 'home',
-      pages: ['home']
-    }
+      activePage: "login", // Start with the login page
+      pages: ["home", "login"], // Register page is not part of the nav list
+      user: null, // Store user details
+    };
   },
   methods: {
-    changePage(page) {
-      console.log("Changing page to: " + page);
+    navigate(page) {
       this.activePage = page;
-    }
-  }
-}
+
+      if (page === "login") {
+        this.$refs.loginPage?.resetState();
+      }
+    },
+    handleLoginSuccess() {
+      this.navigate("home");
+    },
+    handleRegisterSucces() {
+      this.navigate("login");
+    },
+    showRegisterPage() {
+      this.navigate("register");
+    },
+    showLoginPage() {
+      this.navigate("login");
+    },
+    setUser(userDetails) {
+      this.user = userDetails; // Store user data
+    },
+  },
+};
 </script>
 
 <style>
@@ -71,5 +108,15 @@ export default {
 .nav-list li.active {
   background-color: #2c3e50;
   color: white;
+}
+
+.user-info {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
 }
 </style>

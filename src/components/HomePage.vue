@@ -5,7 +5,7 @@
         </header>
         <section>
             <p>Ontdek de mooiste campings en unieke verblijven over de hele wereld.</p>
-            <button @click="explore">Verken Nu</button>
+            <button>Verken Nu</button>
         </section>
     </div>
 </template>
