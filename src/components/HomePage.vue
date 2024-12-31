@@ -5,7 +5,6 @@
         </header>
         <section>
             <p>Ontdek de mooiste campings en unieke verblijven over de hele wereld.</p>
-            <button>Verken Nu</button>
         </section>
     </div>
 </template>
