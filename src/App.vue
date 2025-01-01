@@ -2,7 +2,6 @@
   <div id="app">
     <nav>
       <ul class="nav-list">
-        <!-- Dynamically render pages -->
         <li
           v-for="(page, index) in pages"
           :key="index"
@@ -12,7 +11,6 @@
           {{ page }}
         </li>
       </ul>
-      <!-- Display username in the top-right corner -->
       <div class="user-info" v-if="user">
         {{ user.username }}
       </div>
@@ -158,11 +156,13 @@ export default {
 
 .user-info {
   position: absolute;
+  margin-right: 20px;
+  margin-top: 10px;
   top: 10px;
   right: 10px;
   background-color: #f0f0f0;
   padding: 5px 10px;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 20px;
 }
 </style>

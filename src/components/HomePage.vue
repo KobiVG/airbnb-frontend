@@ -57,4 +57,8 @@
     button:hover {
         background-color: #e04e4e;
     }
+
+    p {
+        font-size: 25px;
+    }
 </style>
