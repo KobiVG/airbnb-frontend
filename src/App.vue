@@ -2,6 +2,7 @@
   <div id="app">
     <nav>
       <ul class="nav-list">
+        <!-- Dynamically render pages -->
         <li
           v-for="(page, index) in pages"
           :key="index"
@@ -19,6 +20,7 @@
 
     <hr />
 
+    <!-- Page Components -->
     <HomePage v-show="activePage === 'home'" />
     <LoginPage
       v-show="activePage === 'login'"
@@ -38,6 +40,10 @@
       @navigate-add-camping="showAddCampingPage"
     />
     <AddCampingPage v-show="activePage === 'add-camping'" />
+    <BookingsPage 
+      v-show="activePage === 'bookings'" 
+      :user="user"
+    />
   </div>
 </template>
 
@@ -47,6 +53,7 @@ import LoginPage from "./components/LoginPage.vue";
 import RegisterPage from "./components/RegisterPage.vue";
 import CampingsPage from "./components/CampingsPage.vue";
 import AddCampingPage from "./components/AddCampingPage.vue";
+import BookingsPage from "./components/BookingsPage.vue";
 
 export default {
   name: "App",
@@ -56,11 +63,12 @@ export default {
     RegisterPage,
     CampingsPage,
     AddCampingPage,
+    BookingsPage,
   },
   data() {
     return {
       activePage: "login", // Default to login page
-      pages: ["home", "login"], // Base pages
+      pages: ["home", "login"], // Base pages always visible
       user: null, // Store logged-in user details
     };
   },
@@ -68,25 +76,23 @@ export default {
     // Watch for changes in the user state
     user(newValue) {
       if (newValue) {
-        // Add "campings" to the navigation when logged in
+        // Add pages for logged-in users
         if (!this.pages.includes("campings")) {
           this.pages.push("campings");
         }
+        if (!this.pages.includes("bookings")) {
+          this.pages.push("bookings");
+        }
       } else {
-        // Remove "campings" from the navigation when logged out
-        this.pages = this.pages.filter((page) => page !== "campings");
+        // Remove pages when logged out
+        this.pages = this.pages.filter(
+          (page) => !["campings", "bookings"].includes(page)
+        );
       }
     },
   },
   methods: {
     navigate(page) {
-      // Prevent unauthorized access to the campings page
-      if (page === "campings" && !this.user) {
-        alert("You must be logged in to access this page.");
-        this.activePage = "login";
-        return;
-      }
-
       this.activePage = page;
 
       // Reset login state when navigating back to login
@@ -110,7 +116,7 @@ export default {
       this.navigate("add-camping");
     },
     setUser(userDetails) {
-      this.user = userDetails; // Store user data
+      this.user = userDetails; // Store user details upon login
     },
   },
 };
