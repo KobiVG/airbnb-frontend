@@ -1,7 +1,7 @@
 <template>
     <div class="campings-page">
       <h1>Available Camping Spots</h1>
-      <button v-if="user && user.role === 'owner'" @click="goToAddCampingPage">Add New Camping Spot</button>
+      <button v-if="user && user.role === 'owner'" @click="goToAddCampingPage" class="camping-button">Add New Camping Spot</button>
       
       <div class="camping-list">
         <div class="camping-item" v-for="camping in campingSpots" :key="camping.name">
@@ -83,6 +83,17 @@
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .camping-button {
+    background-color: #f6ab59;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px;
   }
   
   .camping-image {

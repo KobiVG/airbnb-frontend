@@ -104,7 +104,7 @@ export default {
 .register-form .btn {
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
+  background-color: #f6ab59;
   border: none;
   border-radius: 5px;
   color: white;
