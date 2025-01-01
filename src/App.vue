@@ -2,7 +2,12 @@
   <div id="app">
     <nav>
       <ul class="nav-list">
-        <li v-for="(page, index) in pages" :key="index" @click="navigate(page)" :class="{ active: activePage === page }" >
+        <li
+          v-for="(page, index) in pages"
+          :key="index"
+          @click="navigate(page)"
+          :class="{ active: activePage === page }"
+        >
           {{ page }}
         </li>
       </ul>
@@ -25,8 +30,14 @@
     <RegisterPage
       v-show="activePage === 'register'"
       @navigate-login="showLoginPage"
-      @register-success="handleRegisterSucces"
+      @register-success="handleRegisterSuccess"
     />
+    <CampingsPage 
+      v-show="activePage === 'campings'" 
+      :user="user" 
+      @navigate-add-camping="showAddCampingPage"
+    />
+    <AddCampingPage v-show="activePage === 'add-camping'" />
   </div>
 </template>
 
@@ -34,6 +45,8 @@
 import HomePage from "./components/HomePage.vue";
 import LoginPage from "./components/LoginPage.vue";
 import RegisterPage from "./components/RegisterPage.vue";
+import CampingsPage from "./components/CampingsPage.vue";
+import AddCampingPage from "./components/AddCampingPage.vue";
 
 export default {
   name: "App",
@@ -41,18 +54,42 @@ export default {
     HomePage,
     LoginPage,
     RegisterPage,
+    CampingsPage,
+    AddCampingPage,
   },
   data() {
     return {
-      activePage: "login", // Start with the login page
-      pages: ["home", "login"], // Register page is not part of the nav list
-      user: null, // Store user details
+      activePage: "login", // Default to login page
+      pages: ["home", "login"], // Base pages
+      user: null, // Store logged-in user details
     };
+  },
+  watch: {
+    // Watch for changes in the user state
+    user(newValue) {
+      if (newValue) {
+        // Add "campings" to the navigation when logged in
+        if (!this.pages.includes("campings")) {
+          this.pages.push("campings");
+        }
+      } else {
+        // Remove "campings" from the navigation when logged out
+        this.pages = this.pages.filter((page) => page !== "campings");
+      }
+    },
   },
   methods: {
     navigate(page) {
+      // Prevent unauthorized access to the campings page
+      if (page === "campings" && !this.user) {
+        alert("You must be logged in to access this page.");
+        this.activePage = "login";
+        return;
+      }
+
       this.activePage = page;
 
+      // Reset login state when navigating back to login
       if (page === "login") {
         this.$refs.loginPage?.resetState();
       }
@@ -60,7 +97,7 @@ export default {
     handleLoginSuccess() {
       this.navigate("home");
     },
-    handleRegisterSucces() {
+    handleRegisterSuccess() {
       this.navigate("login");
     },
     showRegisterPage() {
@@ -68,6 +105,9 @@ export default {
     },
     showLoginPage() {
       this.navigate("login");
+    },
+    showAddCampingPage() {
+      this.navigate("add-camping");
     },
     setUser(userDetails) {
       this.user = userDetails; // Store user data
@@ -83,7 +123,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 20px;
 }
 
 .nav-list {
