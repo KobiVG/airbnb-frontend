@@ -5,7 +5,11 @@
       <p>You do not own any campings.</p>
     </div>
     <div class="camping-list">
-      <div class="camping-item" v-for="(camping, index) in campingSpots" :key="index">
+      <div
+        class="camping-item"
+        v-for="camping in campingSpots"
+        :key="camping.camping_spot_id" >
+
         <img :src="camping.image" alt="Camping Image" class="camping-image" />
         <div class="camping-details">
           <h2>{{ camping.name }}</h2>
@@ -14,132 +18,147 @@
           <p><strong>Price per night:</strong> €{{ camping.price_per_night }}</p>
         </div>
         <div class="camping-actions">
-          <button class="camping-button">Delete</button>
+          <button @click="deleteCampingSpot(camping.camping_spot_id)" class="camping-button">Delete</button>
         </div>
       </div>
     </div>
   </div>
 </template>
-  
+
 <script>
-  import axios from "axios";
-  
-  export default {
-    name: "OwnerCampingsPage",
-    data() {
-      return {
-        campingSpots: [], // Holds the camping spots list
-      };
+import axios from "axios";
+
+export default {
+  name: "OwnerCampingsPage",
+  data() {
+    return {
+      campingSpots: [], // Holds the camping spots list
+    };
+  },
+  props: {
+    user: Object, // Expect user object passed as a prop
+  },
+  watch: {
+    user(newUser) {
+      if (newUser && newUser.userId) {
+        this.fetchOwnerCampings();
+      }
     },
-    props: {
-      user: Object, // Expect user object passed as a prop
-    },
-    watch: {
-      user(newUser) {
-        if (newUser && newUser.userId) {
-          this.fetchOwnerCampings();
-        }
-      },
-    },
-    methods: {
-      async fetchOwnerCampings() {
-        try {
+  },
+  methods: {
+    async fetchOwnerCampings() {
+      try {
           const response = await axios.get(
-            `http://localhost:3000/api/owner-camping-spots/${this.user.userId}`
+              `http://localhost:3000/api/owner-camping-spots/${this.user.userId}`
           );
-          this.campingSpots = response.data; // Store fetched camping spots
-        } catch (error) {
+          console.log("API Response:", response.data); // Debugging log
+          this.campingSpots = response.data;
+      } catch (error) {
           console.error("Error fetching owner's camping spots:", error);
-        }
-      },
+      }
     },
-    mounted() {
-      this.fetchOwnerCampings(); // Fetch campings on component mount
+    async deleteCampingSpot(campingId) {
+      try {
+        console.log("Deleting camping spot with ID:", campingId); // Add this for debugging
+        const response = await axios.delete(
+          `http://localhost:3000/api/camping-spot/${campingId}`
+        );
+        console.log("Camping spot deleted successfully:", response.data);
+
+        // Optionally refetch or remove the deleted item from the array
+        this.campingSpots = this.campingSpots.filter(
+          (camping) => camping.camping_spot_id !== campingId
+        );
+      } catch (error) {
+        console.error("Error deleting camping spot:", error);
+      }
     },
-  };
+  },
+  mounted() {
+    this.fetchOwnerCampings(); // Fetch campings on component mount
+  },
+};
 </script>
-  
+
 <style scoped>
-  .campings-page {
-    padding: 20px;
-  }
-  
-  .camping-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-  }
-  
-  .camping-item {
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: white;
-    padding: 10px;
-    height: 400px;
-  }
-  
-  .camping-details {
-    flex-grow: 1;
-  }
-  
-  .camping-button {
-    background-color: #f6ab59;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 5px;
-    text-align: center;
-    width: 100%;
-    margin-top: 10px;
-  }
-  
-  .camping-button:hover {
-    background-color: #f28f1f;
-  }
-  
-  .camping-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 5px;
-  }
-  
-  .camping-item h2 {
-    margin: 10px 0;
-    font-size: 1.5rem;
-    text-align: center;
-  }
-  
-  .camping-item p {
-    margin: 5px 10px;
-    font-size: 1rem;
-  }
-  
-  .camping-item p strong {
-    font-weight: bold;
-  }
-  
-  .camping-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
+.campings-page {
+  padding: 20px;
+}
 
-  .no-campings {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 1.2em;
-    color: #888;
-  }
+.camping-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.camping-item {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  padding: 10px;
+  height: 400px;
+}
+
+.camping-details {
+  flex-grow: 1;
+}
+
+.camping-button {
+  background-color: #f6ab59;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.camping-button:hover {
+  background-color: #f28f1f;
+}
+
+.camping-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.camping-item h2 {
+  margin: 10px 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.camping-item p {
+  margin: 5px 10px;
+  font-size: 1rem;
+}
+
+.camping-item p strong {
+  font-weight: bold;
+}
+
+.camping-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.no-campings {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: #888;
+}
 </style>
-
-  
