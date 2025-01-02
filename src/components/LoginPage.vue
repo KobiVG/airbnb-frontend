@@ -63,13 +63,15 @@ export default {
 
         console.log("Login successful:", loginResponse.data);
 
-        // Fetch user details after login
-        const userDetailsResponse = await axios.get(
-          `http://localhost:3000/api/users?email=${this.email}`
-        );
+        // Extract user details (including user_id) from the login response
+        const userDetails = {
+          userId: loginResponse.data.userId,
+          username: loginResponse.data.username,
+          email: loginResponse.data.email,
+          role: loginResponse.data.role,
+        };
 
-        const userDetails = userDetailsResponse.data;
-        console.log("Fetched user details:", userDetails);
+        console.log("User details fetched from login:", userDetails);
 
         // Pass user details to parent component
         this.$emit("user-data", userDetails);
@@ -84,7 +86,7 @@ export default {
     goToRegister() {
       this.$emit('navigate-register'); // Emit event to navigate to the register page
     }
-  },
+  }
 };
 </script>
 
@@ -96,6 +98,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-top: 50px;
 }
 
 .login-form .form-group {

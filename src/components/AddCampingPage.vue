@@ -11,8 +11,8 @@
           <textarea id="description" v-model="newCamping.description" required></textarea>
         </div>
         <div>
-          <label for="location">Location (latitude, longitude)</label>
-          <input type="text" id="location" v-model="newCamping.location" required />
+          <label for="location-2">Location (latitude, longitude)</label>
+          <input type="text" id="location-2" v-model="newCamping.location" required />
         </div>
         <div>
           <label for="price_per_night">Price per night (€)</label>

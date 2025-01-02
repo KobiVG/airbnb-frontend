@@ -40,8 +40,10 @@
     <AddCampingPage v-show="activePage === 'add-camping'" />
     <BookingsPage 
       v-show="activePage === 'bookings'" 
-      :user="user"
+      :user="user" 
+      v-if="user"
     />
+    <OwnerCampingsPage v-show="activePage === 'owned campings'" :user="user" />
   </div>
 </template>
 
@@ -52,6 +54,7 @@ import RegisterPage from "./components/RegisterPage.vue";
 import CampingsPage from "./components/CampingsPage.vue";
 import AddCampingPage from "./components/AddCampingPage.vue";
 import BookingsPage from "./components/BookingsPage.vue";
+import OwnerCampingsPage from "./components/OwnerCampingsPage.vue";
 
 export default {
   name: "App",
@@ -62,10 +65,11 @@ export default {
     CampingsPage,
     AddCampingPage,
     BookingsPage,
+    OwnerCampingsPage,
   },
   data() {
     return {
-      activePage: "login", // Default to login page
+      activePage: "home", // Default to login page
       pages: ["home", "login"], // Base pages always visible
       user: null, // Store logged-in user details
     };
@@ -73,18 +77,20 @@ export default {
   watch: {
     // Watch for changes in the user state
     user(newValue) {
-      if (newValue) {
-        // Add pages for logged-in users
-        if (!this.pages.includes("campings")) {
+      // Add pages for logged-in users
+      if (!this.pages.includes("campings")) {
           this.pages.push("campings");
         }
         if (!this.pages.includes("bookings")) {
           this.pages.push("bookings");
         }
-      } else {
+        if (newValue.role === "owner" && !this.pages.includes("owned campings")) {
+          this.pages.push("owned campings");
+        }
+      else {
         // Remove pages when logged out
         this.pages = this.pages.filter(
-          (page) => !["campings", "bookings"].includes(page)
+          (page) => !["campings", "bookings", "owned campings"].includes(page)
         );
       }
     },
@@ -128,11 +134,22 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 20px;
+  padding-top: 60px;
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 10;
+  border-bottom: 2px solid #ccc;
 }
 
 .nav-list {
   list-style-type: none;
-  padding: 0;
+  padding: 10px 0;
   display: flex;
   justify-content: center;
   gap: 20px;
@@ -157,7 +174,7 @@ export default {
 .user-info {
   position: absolute;
   margin-right: 20px;
-  margin-top: 10px;
+  margin-top: 18px;
   top: 10px;
   right: 10px;
   background-color: #f0f0f0;

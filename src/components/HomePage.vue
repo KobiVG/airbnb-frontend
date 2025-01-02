@@ -4,7 +4,7 @@
             <h1>Welkom bij AirBnb Camping</h1>
         </header>
         <section>
-            <img src="pixlr-image-generator-724df496-84c4-4e7e-a92a-1b967db2b30c-removebg-preview.png" alt="AirBnb Camping" class="camping-image" />
+            <img src="../assets/airbnbLogo.png" alt="AirBnb Camping" class="camping-image" />
             <p>Ontdek de mooiste campings en unieke verblijven over de hele wereld.</p>
         </section>
     </div>
