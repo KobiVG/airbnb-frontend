@@ -1,28 +1,24 @@
 <template>
-    <div class="campings-page">
-      <h1>My Campings</h1>
-      <div v-if="campingSpots.length === 0" class="no-campings">
-        <p>You do not own any campings.</p>
-      </div>
-      <div class="camping-list">
-        <div class="camping-item" v-for="(camping, index) in filteredCampingSpots" :key="index">
-
-          <img :src="camping.image" alt="Camping Image" class="camping-image" />
-
-          <div class="camping-details">
-            <h2>{{ camping.name }}</h2>
-            <p>{{ camping.description }}</p>
-            <p><strong>Location:</strong> {{ camping.location }}</p>
-            <p><strong>Price per night:</strong> €{{ camping.price_per_night }}</p>
-          </div>
-
-          <div class="camping-actions">
-            <button class="camping-button">Delete</button>
-          </div>
-
+  <div class="campings-page">
+    <h1>My Campings</h1>
+    <div v-if="campingSpots.length === 0" class="no-campings">
+      <p>You do not own any campings.</p>
+    </div>
+    <div class="camping-list">
+      <div class="camping-item" v-for="(camping, index) in campingSpots" :key="index">
+        <img :src="camping.image" alt="Camping Image" class="camping-image" />
+        <div class="camping-details">
+          <h2>{{ camping.name }}</h2>
+          <p>{{ camping.description }}</p>
+          <p><strong>Location:</strong> {{ camping.location }}</p>
+          <p><strong>Price per night:</strong> €{{ camping.price_per_night }}</p>
+        </div>
+        <div class="camping-actions">
+          <button class="camping-button">Delete</button>
         </div>
       </div>
     </div>
+  </div>
 </template>
   
 <script>
@@ -32,7 +28,7 @@
     name: "OwnerCampingsPage",
     data() {
       return {
-        campingSpots: [],
+        campingSpots: [], // Holds the camping spots list
       };
     },
     props: {
@@ -51,32 +47,19 @@
           const response = await axios.get(
             `http://localhost:3000/api/owner-camping-spots/${this.user.userId}`
           );
-          this.campingSpots = response.data;
-          this.filteredCampingSpots = this.campingSpots; // Initial list before filtering
+          this.campingSpots = response.data; // Store fetched camping spots
         } catch (error) {
           console.error("Error fetching owner's camping spots:", error);
         }
       },
-      applyFilters() {
-        this.filteredCampingSpots = this.campingSpots.filter((camping) => {
-          const priceCondition =
-            (this.filters.minPrice ? camping.price_per_night >= this.filters.minPrice : true) &&
-            (this.filters.maxPrice ? camping.price_per_night <= this.filters.maxPrice : true);
-  
-          const locationCondition =
-            this.filters.location ? camping.location.toLowerCase().includes(this.filters.location.toLowerCase()) : true;
-  
-          return priceCondition && locationCondition;
-        });
-      },
     },
     mounted() {
-      this.fetchOwnerCampings();
+      this.fetchOwnerCampings(); // Fetch campings on component mount
     },
   };
 </script>
   
-  <style scoped>
+<style scoped>
   .campings-page {
     padding: 20px;
   }
@@ -157,5 +140,6 @@
     font-size: 1.2em;
     color: #888;
   }
-  </style>
+</style>
+
   
