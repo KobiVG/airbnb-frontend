@@ -12,7 +12,7 @@
         </li>
       </ul>
       <div class="user-info" v-if="user">
-        {{ user.username }}
+        <p @click="navigateToChangeUserInfo">{{ user.username }}</p>
       </div>
     </nav>
 
@@ -43,7 +43,18 @@
       :user="user" 
       v-if="user"
     />
-    <OwnerCampingsPage v-show="activePage === 'owned campings'" :user="user" />
+    <OwnerCampingsPage
+      v-show="activePage === 'owned campings'"
+      :user="user"
+      v-if="user"
+    />
+    <ChangeUserInformationPage
+      v-show="activePage === 'change-user-info'"
+      :user="user"
+      v-if="user"
+      @navigate-back="navigate('home')"
+      @user-updated="updateUser"
+    />
   </div>
 </template>
 
@@ -55,6 +66,8 @@ import CampingsPage from "./components/CampingsPage.vue";
 import AddCampingPage from "./components/AddCampingPage.vue";
 import BookingsPage from "./components/BookingsPage.vue";
 import OwnerCampingsPage from "./components/OwnerCampingsPage.vue";
+import ChangeUserInformationPage from "./components/ChangeUserInformationPage.vue";
+
 
 export default {
   name: "App",
@@ -66,6 +79,7 @@ export default {
     AddCampingPage,
     BookingsPage,
     OwnerCampingsPage,
+    ChangeUserInformationPage,
   },
   data() {
     return {
@@ -87,12 +101,6 @@ export default {
         if (newValue.role === "owner" && !this.pages.includes("owned campings")) {
           this.pages.push("owned campings");
         }
-      else {
-        // Remove pages when logged out
-        this.pages = this.pages.filter(
-          (page) => !["campings", "bookings", "owned campings"].includes(page)
-        );
-      }
     },
   },
   methods: {
@@ -118,6 +126,14 @@ export default {
     },
     showAddCampingPage() {
       this.navigate("add-camping");
+    },
+    navigateToChangeUserInfo() {
+      if (this.user) {
+        this.activePage = "change-user-info";
+      }
+    },
+    updateUser(updatedUser) {
+    this.user = updatedUser; // Update user data immediately
     },
     setUser(userDetails) {
       this.user = userDetails; // Store user details upon login
@@ -174,7 +190,7 @@ nav {
 .user-info {
   position: absolute;
   margin-right: 20px;
-  margin-top: 18px;
+  margin-top: -1px;
   top: 10px;
   right: 10px;
   background-color: #f0f0f0;
