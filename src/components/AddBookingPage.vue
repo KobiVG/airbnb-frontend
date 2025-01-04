@@ -3,8 +3,8 @@
 To do list:
 
 Must have
-- As a user, I want to change my user information
-- As a user, I want to book a camping spot. 
+- As a user, I want to book a camping spot.
+- fix addcamping spot image
 
 Nice to Have
 • As a user, I want to see an interactive map.

@@ -68,7 +68,6 @@ import BookingsPage from "./components/BookingsPage.vue";
 import OwnerCampingsPage from "./components/OwnerCampingsPage.vue";
 import ChangeUserInformationPage from "./components/ChangeUserInformationPage.vue";
 
-
 export default {
   name: "App",
   components: {
@@ -87,21 +86,6 @@ export default {
       pages: ["home", "login"], // Base pages always visible
       user: null, // Store logged-in user details
     };
-  },
-  watch: {
-    // Watch for changes in the user state
-    user(newValue) {
-      // Add pages for logged-in users
-      if (!this.pages.includes("campings")) {
-          this.pages.push("campings");
-        }
-        if (!this.pages.includes("bookings")) {
-          this.pages.push("bookings");
-        }
-        if (newValue.role === "owner" && !this.pages.includes("owned campings")) {
-          this.pages.push("owned campings");
-        }
-    },
   },
   methods: {
     navigate(page) {
@@ -133,10 +117,26 @@ export default {
       }
     },
     updateUser(updatedUser) {
-    this.user = updatedUser; // Update user data immediately
+      this.user = updatedUser; // Update user data immediately
     },
     setUser(userDetails) {
-      this.user = userDetails; // Store user details upon login
+      // Clear state related to the previous user
+      this.user = null;
+      this.pages = ["home", "login"]; // Reset pages to the default
+
+      // Set new user
+      this.user = userDetails;
+
+      // Add role-based pages
+      if (userDetails.role === "owner") {
+        this.pages.push("owned campings");
+      }
+      if (!this.pages.includes("campings")) {
+        this.pages.push("campings");
+      }
+      if (!this.pages.includes("bookings")) {
+        this.pages.push("bookings");
+      }
     },
   },
 };

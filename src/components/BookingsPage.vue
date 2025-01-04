@@ -17,39 +17,54 @@
     </div>
   </template>
   
-<script>
+  <script>
   import axios from "axios";
   
   export default {
-  name: "UserBookings",
-  props: {
-    user: Object,
-  },
+    name: "UserBookings",
+    props: {
+      user: Object,
+    },
     data() {
-    return {
+      return {
         bookings: [],
         userId: this.user ? this.user.userId : null,
-    };
+      };
     },
     methods: {
-    async fetchBookings() {
+      async fetchBookings() {
         try {
-        const response = await axios.get(
+          const response = await axios.get(
             `http://localhost:3000/api/user-bookings/${this.userId}`
-        );
-        this.bookings = response.data;
+          );
+          this.bookings = response.data;
         } catch (error) {
-        console.error("Nog geen boekingen gemaakt.", error);
+          console.error("Error fetching bookings.", error);
         }
+      },
     },
+    watch: {
+      user: {
+        handler(newUser) {
+          if (newUser) {
+            this.userId = newUser.userId; // Update userId
+            this.bookings = []; // Clear previous bookings
+            this.fetchBookings(); // Fetch new bookings
+          } else {
+            this.bookings = []; // Clear state if user is null
+          }
+        },
+        immediate: true,
+      },
     },
     created() {
-    if (this.userId) {
+      if (this.userId) {
         this.fetchBookings();
-    }
+      }
     },
-};
-</script>
+  };
+  </script>
+   
   
   <style scoped>
   .user-bookings {

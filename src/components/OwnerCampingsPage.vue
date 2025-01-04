@@ -30,55 +30,47 @@ import axios from "axios";
 
 export default {
   name: "OwnerCampingsPage",
+  props: {
+    user: Object,
+  },
   data() {
     return {
-      campingSpots: [], // Holds the camping spots list
+      campingSpots: [],
     };
-  },
-  props: {
-    user: Object, // Expect user object passed as a prop
-  },
-  watch: {
-    user(newUser) {
-      if (newUser && newUser.userId) {
-        this.fetchOwnerCampings();
-      }
-    },
   },
   methods: {
     async fetchOwnerCampings() {
       try {
-          const response = await axios.get(
-              `http://localhost:3000/api/owner-camping-spots/${this.user.userId}`
-          );
-          console.log("API Response:", response.data); // Debugging log
-          this.campingSpots = response.data;
+        const response = await axios.get(
+          `http://localhost:3000/api/owner-camping-spots/${this.user.userId}`
+        );
+        this.campingSpots = response.data;
       } catch (error) {
-          console.error("Error fetching owner's camping spots:", error);
+        console.error("Error fetching owner's camping spots:", error);
       }
     },
-    async deleteCampingSpot(campingId) {
-      try {
-        console.log("Deleting camping spot with ID:", campingId); // Add this for debugging
-        const response = await axios.delete(
-          `http://localhost:3000/api/camping-spot/${campingId}`
-        );
-        console.log("Camping spot deleted successfully:", response.data);
-
-        // Optionally refetch or remove the deleted item from the array
-        this.campingSpots = this.campingSpots.filter(
-          (camping) => camping.camping_spot_id !== campingId
-        );
-      } catch (error) {
-        console.error("Error deleting camping spot:", error);
-      }
+  },
+  watch: {
+    user: {
+      handler(newUser) {
+        if (newUser && newUser.userId) {
+          this.campingSpots = []; // Clear previous campings
+          this.fetchOwnerCampings(); // Fetch new campings
+        } else {
+          this.campingSpots = []; // Clear state if user is null
+        }
+      },
+      immediate: true,
     },
   },
   mounted() {
-    this.fetchOwnerCampings(); // Fetch campings on component mount
+    if (this.user?.userId) {
+      this.fetchOwnerCampings();
+    }
   },
 };
 </script>
+
 
 <style scoped>
 .campings-page {
