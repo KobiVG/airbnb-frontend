@@ -8,9 +8,9 @@
       <div
         class="camping-item"
         v-for="camping in campingSpots"
-        :key="camping.camping_spot_id" >
-
-        <img :src="camping.image" alt="Camping Image" class="camping-image" />
+        :key="camping.camping_spot_id" 
+      >
+        <img :src="`http://localhost:3000${camping.image}`" alt="Camping image" class="camping-image" />
         <div class="camping-details">
           <h2>{{ camping.name }}</h2>
           <p>{{ camping.description }}</p>
@@ -36,6 +36,7 @@ export default {
   data() {
     return {
       campingSpots: [],
+      tallestItemHeight: 0, // Store the height of the tallest item
     };
   },
   methods: {
@@ -45,8 +46,40 @@ export default {
           `http://localhost:3000/api/owner-camping-spots/${this.user.userId}`
         );
         this.campingSpots = response.data;
+        this.setTallestItemHeight(); // Set the tallest item height after fetching campings
       } catch (error) {
         console.error("Error fetching owner's camping spots:", error);
+      }
+    },
+    setTallestItemHeight() {
+      // Calculate the height of the tallest camping item
+      this.$nextTick(() => {
+        const campingItems = document.querySelectorAll(".camping-item");
+        let maxHeight = 0;
+        campingItems.forEach(item => {
+          maxHeight = Math.max(maxHeight, item.offsetHeight);
+        });
+        this.tallestItemHeight = maxHeight; // Set the tallest item height
+      });
+    },
+    async deleteCampingSpot(campingId) {
+      try {
+        console.log("Deleting camping spot with ID:", campingId); // Add this for debugging
+        const response = await axios.delete(
+          `http://localhost:3000/api/camping-spot/${campingId}`
+        );
+        console.log("Camping spot deleted successfully:", response.data);
+
+        this.$emit("refresh-deletedCampings");
+        this.$emit("refresh-deletedBookings");
+
+        // Optionally refetch or remove the deleted item from the array
+        this.campingSpots = this.campingSpots.filter(
+          (camping) => camping.camping_spot_id !== campingId
+        );
+        this.setTallestItemHeight(); // Recalculate tallest item height after deletion
+      } catch (error) {
+        console.error("Error deleting camping spot:", error);
       }
     },
   },
@@ -95,7 +128,9 @@ export default {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   background-color: white;
   padding: 10px;
-  height: 400px;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
 }
 
 .camping-details {

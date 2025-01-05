@@ -19,12 +19,14 @@
     <button v-if="user && user.role === 'owner'" @click="goToAddCampingPage" class="camping-button">Add New Camping Spot</button>
     
     <div class="camping-list">
-      <div class="camping-item" v-for="camping in filteredCampingSpots" :key="camping.name">
-        <img :src="`${camping.image}`" alt="Camping image" class="camping-image" />
+      <div class="camping-item" v-for="camping in filteredCampingSpots" :key="camping.id">
+        <img :src="`http://localhost:3000${camping.image}`" alt="Camping image" class="camping-image" />
         <h2>{{ camping.name }}</h2>
         <p>{{ camping.description }}</p>
         <p><strong>Location:</strong> {{ address[camping.location] || 'Loading...' }}</p>
         <p><strong>Price per night:</strong> €{{ camping.price_per_night }}</p>
+
+        <button class="book-camping-button" @click="goToAddBookingPage(camping.id)">Book this camping</button>
       </div>
     </div>
   </div>
@@ -37,9 +39,9 @@ export default {
   name: "CampingsPage",
   data() {
     return {
-      campingSpots: [],
-      filteredCampingSpots: [],
-      address: {},
+      campingSpots: [],         // Array to store all camping spots
+      filteredCampingSpots: [], // Array to store filtered camping spots
+      address: {},              // Store addresses based on coordinates
       filters: {
         minPrice: null,
         maxPrice: null,
@@ -48,50 +50,78 @@ export default {
     };
   },
   methods: {
+    // Fetch all camping spots
     async fetchCampingSpots() {
       try {
         const response = await axios.get("http://localhost:3000/api/camping-spots");
         this.campingSpots = response.data;
-        this.filteredCampingSpots = this.campingSpots; // Initial list before filtering
-
-        // Fetch addresses for each camping spot
-        this.campingSpots.forEach((camping) => {
-          this.fetchAddress(camping.location);
-        });
+        this.filteredCampingSpots = this.campingSpots;  // Initially, no filter is applied
+        this.fetchAddresses(); // Fetch addresses for the camping spots
       } catch (error) {
         console.error("Error fetching camping spots:", error);
       }
     },
+    
+    // Fetch address for each camping spot based on location coordinates
+    async fetchAddresses() {
+      for (const camping of this.campingSpots) {
+        await this.fetchAddress(camping.location);
+      }
+    },
+
+    // Fetch a specific address from OpenStreetMap using lat, lon
     async fetchAddress(coordinates) {
       try {
+        const [lat, lon] = coordinates.split(",");
         const response = await axios.get(
-          `https://nominatim.openstreetmap.org/reverse?lat=${coordinates.split(",")[0]}&lon=${
-            coordinates.split(",")[1]
-          }&format=json`
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
         );
         this.$set(this.address, coordinates, response.data.display_name);
       } catch (error) {
         console.error("Error fetching address:", error);
       }
     },
+
+    // Apply filters based on min price, max price, and location
     applyFilters() {
       this.filteredCampingSpots = this.campingSpots.filter((camping) => {
         const priceCondition =
           (this.filters.minPrice ? camping.price_per_night >= this.filters.minPrice : true) &&
           (this.filters.maxPrice ? camping.price_per_night <= this.filters.maxPrice : true);
-        
+
         const locationCondition =
-          this.filters.location ? this.address[camping.location]?.toLowerCase().includes(this.filters.location.toLowerCase()) : true;
+          this.filters.location
+            ? (this.address[camping.location] || '').toLowerCase().includes(this.filters.location.toLowerCase())
+            : true;
 
         return priceCondition && locationCondition;
       });
     },
+
+    // Navigate to the AddBookingPage when a camping spot is selected
+    async goToAddBookingPage(campingSpotId) {
+      // Find the selected camping spot details
+      const campingSpot = this.campingSpots.find(spot => spot.id === campingSpotId);
+
+      // Create the full camping spot details object
+      const campingSpotDetails = {
+        campingSpotId: campingSpot.id,
+        name: campingSpot.name,
+        location: campingSpot.location,
+        description: campingSpot.description,
+        price_per_night: campingSpot.price_per_night,
+      };
+
+      // Emit the full camping spot details to App.vue
+      this.$emit("navigate-addbooking", campingSpotDetails);
+    },
+
     goToAddCampingPage() {
       this.$emit("navigate-add-camping");
     },
   },
   mounted() {
-    this.fetchCampingSpots();
+    this.fetchCampingSpots();  // Fetch the camping spots when the component is mounted
   },
   props: {
     user: Object,
@@ -105,7 +135,7 @@ export default {
   }
 
   .filter {
-    margin-bottom: 20px;
+    margin-bottom: 9px;
   }
 
   .filter label {
@@ -125,10 +155,14 @@ export default {
 
   .camping-item {
     width: 300px;
+    min-height: 450px; /* Set a fixed minimum height for consistency */
     border: 1px solid #ccc;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensures the button stays at the bottom */
   }
 
   .camping-button {
@@ -137,9 +171,23 @@ export default {
     border: none;
     padding: 10px 20px;
     margin-bottom: 20px;
+    margin-top: -20px;
     font-size: 1em;
     cursor: pointer;
     border-radius: 5px;
+  }
+
+  .book-camping-button {
+    background-color: #f6ab59;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-bottom-right-radius: 5px;
+    text-align: center;
+    width: 100%;
+    margin-top: auto;
   }
 
   .camping-image {

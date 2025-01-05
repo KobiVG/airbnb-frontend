@@ -76,7 +76,10 @@ export default {
         // Pass user details to parent component
         this.$emit("user-data", userDetails);
 
-        this.$emit("login-success"); // Notify login success
+        this.$emit("login-success");
+        this.$emit("login-success-bookings");
+        this.$emit("login-success-campings");
+        this.$emit("login-success-owned-campings");
         this.resetState();
       } catch (err) {
         this.error = err.response?.data?.error || "Er ging iets mis.";

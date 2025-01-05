@@ -21,7 +21,7 @@
   import axios from "axios";
   
   export default {
-    name: "UserBookings",
+    name: "BookingsPage",
     props: {
       user: Object,
     },
@@ -46,24 +46,24 @@
     watch: {
       user: {
         handler(newUser) {
-          if (newUser) {
-            this.userId = newUser.userId; // Update userId
-            this.bookings = []; // Clear previous bookings
-            this.fetchBookings(); // Fetch new bookings
+          if (newUser && newUser.userId) {
+            this.userId = newUser.userId;
+            this.fetchBookings(); // Fetch bookings when user changes
           } else {
-            this.bookings = []; // Clear state if user is null
+            this.bookings = []; // Clear bookings if no user
           }
         },
         immediate: true,
       },
     },
-    created() {
+    mounted() {
       if (this.userId) {
         this.fetchBookings();
       }
     },
   };
   </script>
+  
    
   
   <style scoped>

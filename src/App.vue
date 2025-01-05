@@ -19,41 +19,63 @@
     <hr />
 
     <!-- Page Components -->
-    <HomePage v-show="activePage === 'home'" />
-    <LoginPage
-      v-show="activePage === 'login'"
-      ref="loginPage"
-      @navigate-register="showRegisterPage"
-      @login-success="handleLoginSuccess"
-      @user-data="setUser"
+    <HomePage 
+      v-show="activePage === 'home'" 
     />
-    <RegisterPage
-      v-show="activePage === 'register'"
-      @navigate-login="showLoginPage"
-      @register-success="handleRegisterSuccess"
+    <LoginPage 
+      ref="loginPage"
+      v-show="activePage === 'login'" 
+      @navigate-register="showRegisterPage" 
+      @login-success="handleLoginSuccess,refreshBookings,refreshCampings,refreshOwnedCampings" 
+      @user-data="setUser" 
+    />
+    <RegisterPage 
+      v-show="activePage === 'register'" 
+      @navigate-login="showLoginPage" 
+      @register-success="handleRegisterSuccess" 
     />
     <CampingsPage 
       v-show="activePage === 'campings'" 
-      :user="user" 
-      @navigate-add-camping="showAddCampingPage"
+      :user="user"
+      @navigate-add-camping="showAddCampingPage" 
+      @navigate-addbooking="showAddBookingPage"
+      ref="campingsPage" 
     />
-    <AddCampingPage v-show="activePage === 'add-camping'" />
+    <AddCampingPage 
+      v-show="activePage === 'add-camping'" 
+      :user="user" 
+      @addingCamping-success="handleAddCampingSucces"
+      @refresh-campings="refreshCampings"
+      @refresh-ownedCampings="refreshOwnedCampings"
+    />
     <BookingsPage 
       v-show="activePage === 'bookings'" 
       :user="user" 
       v-if="user"
+      ref="bookingsPage"
     />
-    <OwnerCampingsPage
-      v-show="activePage === 'owned campings'"
-      :user="user"
+    <OwnerCampingsPage 
+      v-show="activePage === 'owned campings'" 
+      :user="user" 
       v-if="user"
+      ref="ownerCampingsPage"
+      @refresh-deletedCampings="refreshCampings"
+      @refresh-deletedBookings="refreshBookings"
     />
-    <ChangeUserInformationPage
-      v-show="activePage === 'change-user-info'"
-      :user="user"
-      v-if="user"
-      @navigate-back="navigate('home')"
-      @user-updated="updateUser"
+    <ChangeUserInformationPage 
+      v-show="activePage === 'change-user-info'" 
+      :user="user" 
+      v-if="user" 
+      @navigate-back="navigate('home')" 
+      @user-updated="updateUser" 
+    />
+    <AddBookingPage 
+      v-show="activePage === 'add-booking'" 
+      :user="user" 
+      v-if="user" 
+      @booking-success="handleBookingSuccess" 
+      :campingSpotDetails="campingSpotDetails || {}"
+      @refresh-bookings="refreshBookings"
     />
   </div>
 </template>
@@ -67,6 +89,7 @@ import AddCampingPage from "./components/AddCampingPage.vue";
 import BookingsPage from "./components/BookingsPage.vue";
 import OwnerCampingsPage from "./components/OwnerCampingsPage.vue";
 import ChangeUserInformationPage from "./components/ChangeUserInformationPage.vue";
+import AddBookingPage from "./components/AddBookingPage.vue";
 
 export default {
   name: "App",
@@ -79,21 +102,26 @@ export default {
     BookingsPage,
     OwnerCampingsPage,
     ChangeUserInformationPage,
+    AddBookingPage,
   },
   data() {
     return {
       activePage: "home", // Default to login page
       pages: ["home", "login"], // Base pages always visible
       user: null, // Store logged-in user details
+      campingSpotDetails: null, // Store the full camping spot details passed from CampingsPage
     };
   },
   methods: {
     navigate(page) {
       this.activePage = page;
-
+      
       // Reset login state when navigating back to login
       if (page === "login") {
         this.$refs.loginPage?.resetState();
+      }
+      if (page === "add-camping") {
+        this.$refs.AddCampingPage?.resetState();
       }
     },
     handleLoginSuccess() {
@@ -101,6 +129,12 @@ export default {
     },
     handleRegisterSuccess() {
       this.navigate("login");
+    },
+    handleAddCampingSucces() {
+      this.navigate("campings");
+    },
+    handleBookingSuccess() {
+      this.navigate("bookings");
     },
     showRegisterPage() {
       this.navigate("register");
@@ -111,13 +145,28 @@ export default {
     showAddCampingPage() {
       this.navigate("add-camping");
     },
+    showAddBookingPage(campingSpotDetails) {
+      this.campingSpotDetails = campingSpotDetails;
+      this.navigate("add-booking");
+    },
     navigateToChangeUserInfo() {
       if (this.user) {
         this.activePage = "change-user-info";
       }
     },
+    refreshBookings() {
+      this.$refs.bookingsPage.fetchBookings();
+      this.$refs.ownerCampingsPage.fetchOwnerCampings();
+    },
+    refreshCampings() {
+      this.$refs.campingsPage.fetchCampingSpots();
+      this.$refs.ownerCampingsPage.fetchOwnerCampings();
+    },
+    refreshOwnedCampings() {
+      this.$refs.OwnerCampingsPage.fetchOwnerCampings();
+    },
     updateUser(updatedUser) {
-      this.user = updatedUser; // Update user data immediately
+      this.user = updatedUser;
     },
     setUser(userDetails) {
       // Clear state related to the previous user
