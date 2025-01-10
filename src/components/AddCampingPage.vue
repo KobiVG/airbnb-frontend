@@ -76,7 +76,6 @@ export default {
         this.$emit("refresh-campings");
         this.$emit("refresh-ownedCampings");
       } catch (error) {
-        console.error("Error submitting new camping spot:", error);
         alert("Failed to add new camping spot.");
       }
     },

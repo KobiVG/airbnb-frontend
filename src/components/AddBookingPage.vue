@@ -67,7 +67,6 @@
           this.$emit("booking-success");
           this.$emit("refresh-bookings");
         } catch (error) {
-          console.error("Error booking camping spot:", error);
           alert("There was an error while booking. Please try again.");
         }
       },
