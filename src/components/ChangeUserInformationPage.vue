@@ -31,10 +31,8 @@
         <div class="form-group">
           <button type="submit" class="btn btn-primary">Update Information</button>
         </div>
+
       </form>
-    </div>
-    <div v-else>
-      <p>Loading user information...</p>
     </div>
   </template>  
   
@@ -71,28 +69,28 @@
       },
     },
     methods: {
-        async updateUserInfo() {
-            try {
-                const updatedFields = {};
-                if (this.username !== this.user.username) updatedFields.username = this.username;
-                if (this.email !== this.user.email) updatedFields.email = this.email;
-                if (this.role !== this.user.role) updatedFields.role = this.role;
+      async updateUserInfo() {
+        try {
+          const updatedFields = {};
+          if (this.username !== this.user.username) updatedFields.username = this.username;
+          if (this.email !== this.user.email) updatedFields.email = this.email;
+          if (this.role !== this.user.role) updatedFields.role = this.role;
 
-                if (Object.keys(updatedFields).length === 0) {
-                return; // No changes to update
-                }
+          if (Object.keys(updatedFields).length === 0) {
+            return;
+          }
 
-                await axios.put(
-                `http://localhost:3000/api/users/${this.user.userId}`,
-                updatedFields
-                );
+          await axios.put(
+            `http://localhost:3000/api/users/${this.user.userId}`,
+            updatedFields
+          );
 
-                // Emit updated user details to parent
-                this.$emit("user-updated", { ...this.user, ...updatedFields });
-            } catch (error) {
-                console.error(error.response?.data?.error || "An error occurred.");
-            }
-        },
+          const updatedUser = { ...this.user, ...updatedFields };
+          this.$emit("user-updated", updatedUser);
+        } catch (error) {
+          console.error(error.response?.data?.error || "An error occurred.");
+        }
+      },
     },
   };
   </script>

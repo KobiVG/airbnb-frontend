@@ -13,7 +13,7 @@
       </div>
 
       <div class="form-group">
-        <label>Wachtwoord:</label>
+        <label>Password:</label>
         <input
           type="password"
           v-model="password"
@@ -23,14 +23,13 @@
       </div>
 
       <div class="form-group">
-        <button type="submit" class="btn btn-primary">Inloggen</button>
+        <button type="submit" class="btn btn-primary">Login</button>
       </div>
     </form>
     <p v-if="error" class="error-message">{{ error }}</p>
 
-    <!-- Link to register page -->
     <div class="register-link">
-      <p>Heb je geen account? <button @click="goToRegister">Registreer hier</button></p>
+      <p>No account? <button @click="goToRegister">Register here</button></p>
     </div>
   </div>
 </template>
@@ -61,9 +60,6 @@ export default {
           password: this.password,
         });
 
-        console.log("Login successful:", loginResponse.data);
-
-        // Extract user details (including user_id) from the login response
         const userDetails = {
           userId: loginResponse.data.userId,
           username: loginResponse.data.username,
@@ -71,23 +67,15 @@ export default {
           role: loginResponse.data.role,
         };
 
-        console.log("User details fetched from login:", userDetails);
-
-        // Pass user details to parent component
         this.$emit("user-data", userDetails);
-
         this.$emit("login-success");
-        this.$emit("login-success-bookings");
-        this.$emit("login-success-campings");
-        this.$emit("login-success-owned-campings");
         this.resetState();
       } catch (err) {
         this.error = err.response?.data?.error || "Er ging iets mis.";
-        console.error("Login failed:", this.error);
       }
     },
     goToRegister() {
-      this.$emit('navigate-register'); // Emit event to navigate to the register page
+      this.$emit('navigate-register');
     }
   }
 };

@@ -2,7 +2,6 @@
   <div class="campings-page">
     <h1>Available Camping Spots</h1>
     
-    <!-- Filter section -->
     <div class="filter">
       <label for="minPrice">Min Price:</label>
       <input v-model="filters.minPrice" type="number" id="minPrice" placeholder="Min price" />
@@ -39,9 +38,9 @@ export default {
   name: "CampingsPage",
   data() {
     return {
-      campingSpots: [],         // Array to store all camping spots
-      filteredCampingSpots: [], // Array to store filtered camping spots
-      address: {},              // Store addresses based on coordinates
+      campingSpots: [],
+      filteredCampingSpots: [],
+      address: {},
       filters: {
         minPrice: null,
         maxPrice: null,
@@ -50,26 +49,23 @@ export default {
     };
   },
   methods: {
-    // Fetch all camping spots
     async fetchCampingSpots() {
       try {
         const response = await axios.get("http://localhost:3000/api/camping-spots");
         this.campingSpots = response.data;
-        this.filteredCampingSpots = this.campingSpots;  // Initially, no filter is applied
-        this.fetchAddresses(); // Fetch addresses for the camping spots
+        this.filteredCampingSpots = this.campingSpots;
+        this.fetchAddresses();
       } catch (error) {
         console.error("Error fetching camping spots:", error);
       }
     },
     
-    // Fetch address for each camping spot based on location coordinates
     async fetchAddresses() {
       for (const camping of this.campingSpots) {
         await this.fetchAddress(camping.location);
       }
     },
 
-    // Fetch a specific address from OpenStreetMap using lat, lon
     async fetchAddress(coordinates) {
       try {
         const [lat, lon] = coordinates.split(",");
@@ -82,7 +78,6 @@ export default {
       }
     },
 
-    // Apply filters based on min price, max price, and location
     applyFilters() {
       this.filteredCampingSpots = this.campingSpots.filter((camping) => {
         const priceCondition =
@@ -98,12 +93,9 @@ export default {
       });
     },
 
-    // Navigate to the AddBookingPage when a camping spot is selected
     async goToAddBookingPage(campingSpotId) {
-      // Find the selected camping spot details
       const campingSpot = this.campingSpots.find(spot => spot.id === campingSpotId);
 
-      // Create the full camping spot details object
       const campingSpotDetails = {
         campingSpotId: campingSpot.id,
         name: campingSpot.name,
@@ -112,7 +104,6 @@ export default {
         price_per_night: campingSpot.price_per_night,
       };
 
-      // Emit the full camping spot details to App.vue
       this.$emit("navigate-addbooking", campingSpotDetails);
     },
 
@@ -121,7 +112,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchCampingSpots();  // Fetch the camping spots when the component is mounted
+    this.fetchCampingSpots();
   },
   props: {
     user: Object,
@@ -155,14 +146,14 @@ export default {
 
   .camping-item {
     width: 300px;
-    min-height: 450px; /* Set a fixed minimum height for consistency */
+    min-height: 450px;
     border: 1px solid #ccc;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Ensures the button stays at the bottom */
+    justify-content: space-between;
   }
 
   .camping-button {

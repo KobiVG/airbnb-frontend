@@ -1,11 +1,11 @@
 <template>
     <div class="home-page">
         <header>
-            <h1>Welkom bij AirBnb Camping</h1>
+            <h1>Welcome to AirBnb Camping</h1>
         </header>
         <section>
             <img src="../assets/airbnbLogo.png" alt="AirBnb Camping" class="camping-image" />
-            <p>Ontdek de mooiste campings en unieke verblijven over de hele wereld.</p>
+            <p>Discover the most beautiful campsites and unique accommodations around the world.</p>
         </section>
     </div>
 </template>

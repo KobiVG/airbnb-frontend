@@ -18,7 +18,6 @@
 
     <hr />
 
-    <!-- Page Components -->
     <HomePage 
       v-show="activePage === 'home'" 
     />
@@ -26,7 +25,7 @@
       ref="loginPage"
       v-show="activePage === 'login'" 
       @navigate-register="showRegisterPage" 
-      @login-success="handleLoginSuccess,refreshBookings,refreshCampings,refreshOwnedCampings" 
+      @login-success="handleLoginSuccess" 
       @user-data="setUser" 
     />
     <RegisterPage 
@@ -106,17 +105,16 @@ export default {
   },
   data() {
     return {
-      activePage: "home", // Default to login page
-      pages: ["home", "login"], // Base pages always visible
-      user: null, // Store logged-in user details
-      campingSpotDetails: null, // Store the full camping spot details passed from CampingsPage
+      activePage: "home",
+      pages: ["home", "login"],
+      user: null,
+      campingSpotDetails: null,
     };
   },
   methods: {
     navigate(page) {
       this.activePage = page;
       
-      // Reset login state when navigating back to login
       if (page === "login") {
         this.$refs.loginPage?.resetState();
       }
@@ -165,26 +163,32 @@ export default {
     refreshOwnedCampings() {
       this.$refs.OwnerCampingsPage.fetchOwnerCampings();
     },
+    // Consolidated updateUser method
     updateUser(updatedUser) {
-      this.user = updatedUser;
+      this.setUser(updatedUser);
     },
     setUser(userDetails) {
-      // Clear state related to the previous user
       this.user = null;
-      this.pages = ["home", "login"]; // Reset pages to the default
+      this.pages = ["home", "login"];
 
-      // Set new user
       this.user = userDetails;
 
-      // Add role-based pages
       if (userDetails.role === "owner") {
-        this.pages.push("owned campings");
+        if (!this.pages.includes("owned campings")) {
+          this.pages.push("owned campings");
+        }
       }
+
       if (!this.pages.includes("campings")) {
         this.pages.push("campings");
       }
+
       if (!this.pages.includes("bookings")) {
         this.pages.push("bookings");
+      }
+
+      if (!this.pages.includes(this.activePage)) {
+        this.activePage = "home";
       }
     },
   },

@@ -48,9 +48,9 @@
         handler(newUser) {
           if (newUser && newUser.userId) {
             this.userId = newUser.userId;
-            this.fetchBookings(); // Fetch bookings when user changes
+            this.fetchBookings();
           } else {
-            this.bookings = []; // Clear bookings if no user
+            this.bookings = [];
           }
         },
         immediate: true,

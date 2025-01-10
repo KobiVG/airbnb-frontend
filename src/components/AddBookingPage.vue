@@ -32,12 +32,12 @@
     props: {
       user: {
         type: Object,
-        required: true, // Ensures user must be passed
+        required: true,
       },
       campingSpotDetails: {
         type: Object,
         required: true,
-        default: () => ({})  // Default to an empty object if not provided
+        default: () => ({})
       },
     },
     data() {
@@ -49,7 +49,6 @@
     methods: {
       async submitBooking() {
         try {
-          // Ensure all required data is present
           if (!this.user?.userId) {
             throw new Error("User is not logged in or userId is missing.");
           }
@@ -58,7 +57,6 @@
             throw new Error("Camping spot details are incomplete.");
           }
 
-          // Proceed with the booking request
           await axios.post("http://localhost:3000/api/book-camping", {
             userId: this.user.userId,
             campingSpotId: this.campingSpotDetails.campingSpotId,

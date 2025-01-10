@@ -36,7 +36,7 @@ export default {
   data() {
     return {
       campingSpots: [],
-      tallestItemHeight: 0, // Store the height of the tallest item
+      tallestItemHeight: 0,
     };
   },
   methods: {
@@ -46,25 +46,24 @@ export default {
           `http://localhost:3000/api/owner-camping-spots/${this.user.userId}`
         );
         this.campingSpots = response.data;
-        this.setTallestItemHeight(); // Set the tallest item height after fetching campings
+        this.setTallestItemHeight();
       } catch (error) {
         console.error("Error fetching owner's camping spots:", error);
       }
     },
     setTallestItemHeight() {
-      // Calculate the height of the tallest camping item
       this.$nextTick(() => {
         const campingItems = document.querySelectorAll(".camping-item");
         let maxHeight = 0;
         campingItems.forEach(item => {
           maxHeight = Math.max(maxHeight, item.offsetHeight);
         });
-        this.tallestItemHeight = maxHeight; // Set the tallest item height
+        this.tallestItemHeight = maxHeight;
       });
     },
     async deleteCampingSpot(campingId) {
       try {
-        console.log("Deleting camping spot with ID:", campingId); // Add this for debugging
+        console.log("Deleting camping spot with ID:", campingId);
         const response = await axios.delete(
           `http://localhost:3000/api/camping-spot/${campingId}`
         );
@@ -73,11 +72,10 @@ export default {
         this.$emit("refresh-deletedCampings");
         this.$emit("refresh-deletedBookings");
 
-        // Optionally refetch or remove the deleted item from the array
         this.campingSpots = this.campingSpots.filter(
           (camping) => camping.camping_spot_id !== campingId
         );
-        this.setTallestItemHeight(); // Recalculate tallest item height after deletion
+        this.setTallestItemHeight();
       } catch (error) {
         console.error("Error deleting camping spot:", error);
       }
@@ -87,10 +85,10 @@ export default {
     user: {
       handler(newUser) {
         if (newUser && newUser.userId) {
-          this.campingSpots = []; // Clear previous campings
-          this.fetchOwnerCampings(); // Fetch new campings
+          this.campingSpots = [];
+          this.fetchOwnerCampings();
         } else {
-          this.campingSpots = []; // Clear state if user is null
+          this.campingSpots = [];
         }
       },
       immediate: true,

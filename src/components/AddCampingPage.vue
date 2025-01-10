@@ -31,7 +31,7 @@
 import axios from 'axios';
 
 export default {
-  props: ['user'],  // Receive user data from parent (App.vue)
+  props: ['user'],
   data() {
     return {
       newCamping: {
@@ -82,7 +82,7 @@ export default {
     },
 
     handleImageUpload(event) {
-      this.newCamping.image = event.target.files[0]; // Store the image file in the data object
+      this.newCamping.image = event.target.files[0];
     },
   },
 };

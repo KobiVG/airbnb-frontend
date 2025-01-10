@@ -64,17 +64,14 @@ export default {
         this.successMessage = response.data.message;
         this.$emit("register-success");
         this.errorMessage = "";
+
       } catch (error) {
-        // Log the full error for debugging purposes
-        console.error("Registration error:", error.response);
-        
-        this.errorMessage =
-          error.response?.data?.message || "An error occurred.";
+        this.errorMessage = error.response?.data?.message || "An error occurred.";
         this.successMessage = "";
       }
     },
     goToLogin() {
-      this.$emit('navigate-login'); // Emit event to navigate to the login page
+      this.$emit('navigate-login');
     }
   }
 };
